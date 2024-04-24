@@ -1,4 +1,4 @@
-package com.io.reportscheduler;
+package com.iot.reportscheduler;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
