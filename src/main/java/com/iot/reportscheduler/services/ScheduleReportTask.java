@@ -1,5 +1,6 @@
 package com.iot.reportscheduler.services;
 
+import com.iot.reportscheduler.bot.LocomotiveBot;
 import com.iot.reportscheduler.models.LocomotiveSummary;
 import com.iot.reportscheduler.repository.LocomotiveRepository;
 import com.iot.reportscheduler.repository.LocomotiveSummaryRepository;
@@ -8,6 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Component
 public class ScheduleReportTask {
@@ -19,6 +25,9 @@ public class ScheduleReportTask {
 
     @Autowired
     private LocomotiveSummaryRepository locomotiveSummaryRepository;
+
+    @Autowired
+    private LocomotiveBot locomotiveBot;
 
     @Scheduled(fixedRate = 10000)
     public void summaryReport() {
@@ -44,6 +53,23 @@ public class ScheduleReportTask {
 
         log.info("Finish Saving Locomotive Summary to DB Postgres");
 
-        // todo: send summary loco via bot telegram
+        // send summary loco via bot telegram
+        Instant currentTimeUTC = Instant.now();
+        ZoneId zone = ZoneId.of("Asia/Jakarta");
+        ZonedDateTime localTime = currentTimeUTC.atZone(zone);
+        String currentTime = localTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss XXX"));
+
+        String summary = """
+                <b>LOCOMOTIVE SUMMARY REPORT</b>
+                <b><i>(%s)</i></b>
+
+                Total Under Maintenance: %d
+                Total Transit at Station: %d
+                Total Departure: %d
+
+                Total Locomotive: %d
+                """.formatted(currentTime, totalLocMaintenance, totalLocTransit, totalLocDeparture, totalLoc);
+
+        locomotiveBot.sendTextMessage(summary);
     }
 }
