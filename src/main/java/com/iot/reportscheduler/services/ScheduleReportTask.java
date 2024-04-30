@@ -70,6 +70,6 @@ public class ScheduleReportTask {
                 Total Locomotive: %d
                 """.formatted(currentTime, totalLocMaintenance, totalLocTransit, totalLocDeparture, totalLoc);
 
-//        locomotiveBot.sendTextMessage(summary);
+       locomotiveBot.sendTextMessage(summary);
     }
 }
